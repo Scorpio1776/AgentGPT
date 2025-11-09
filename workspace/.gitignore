@@ -1,0 +1,10 @@
+# Ignore all workspace data - this is local user data
+*
+
+# But keep the directory structure
+!.gitignore
+!README.md
+!leads/.gitkeep
+!jobs/.gitkeep
+!websites/.gitkeep
+!marketing/.gitkeep
