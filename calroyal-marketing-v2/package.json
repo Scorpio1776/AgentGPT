@@ -1,12 +1,29 @@
 {
-  "name": "calroyal-marketing-v2",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "calroyal-marketing-automation-v2",
+  "version": "2.0.0",
+  "description": "Enterprise-grade AI-powered marketing platform for Cal-Royal hardware",
+  "main": "dist/calRoyalMarketingV2.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "start": "npx ts-node examples/implementation.ts",
+    "dev": "ts-node examples/implementation.ts",
+    "example": "npx ts-node examples/implementation.ts"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "keywords": ["marketing", "automation", "AI", "personalization"],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.0",
+    "date-fns": "^2.30.0",
+    "dotenv": "^16.3.1",
+    "node-cache": "^5.1.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "ts-node": "^10.9.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
 }
