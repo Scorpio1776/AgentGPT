@@ -1,0 +1,57 @@
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/home/user/AgentGPT"
+      ],
+      "description": "Efficient file operations for AgentGPT codebase"
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "<YOUR_GITHUB_TOKEN>"
+      },
+      "description": "Direct GitHub API access for PRs, issues, and repo operations"
+    },
+    "git": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-git"],
+      "description": "Advanced git operations"
+    },
+    "fetch": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-fetch"],
+      "description": "Efficient web fetching for API docs and resources"
+    },
+    "brave-search": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-brave-search"],
+      "env": {
+        "BRAVE_API_KEY": "<YOUR_BRAVE_API_KEY>"
+      },
+      "description": "Web search for documentation and troubleshooting (optional)"
+    }
+  },
+  "mcpOptimization": {
+    "notes": [
+      "filesystem: Reduces token usage by ~30% for large file operations",
+      "github: Eliminates web scraping, speeds up PR/issue operations by 5-10x",
+      "git: Provides advanced git history and diff capabilities",
+      "fetch: More efficient than WebFetch for repeated API calls",
+      "brave-search: Optional, only needed if you want web search in desktop app"
+    ],
+    "installation": {
+      "linux": "~/.config/Claude/claude_desktop_config.json",
+      "macos": "~/Library/Application Support/Claude/claude_desktop_config.json",
+      "windows": "%APPDATA%/Claude/claude_desktop_config.json"
+    },
+    "requiredTokens": {
+      "github": "Create at https://github.com/settings/tokens (repo, read:org scopes)",
+      "brave": "Get free API key at https://brave.com/search/api/"
+    }
+  }
+}
