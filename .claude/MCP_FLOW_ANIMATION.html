@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgentGPT MCP Flow - Animated Visualization</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            text-align: center;
+            margin-bottom: 30px;
+            opacity: 0.9;
+            font-size: 1.2em;
+        }
+
+        .controls {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid white;
+            color: white;
+            padding: 12px 30px;
+            margin: 0 10px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .btn.active {
+            background: #4CAF50;
+            border-color: #4CAF50;
+        }
+
+        .flow-diagram {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .flow-stage {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            position: relative;
+            min-height: 400px;
+            transition: all 0.5s;
+        }
+
+        .flow-stage.active {
+            background: rgba(255,255,255,0.25);
+            border-color: #4CAF50;
+            box-shadow: 0 10px 30px rgba(76, 175, 80, 0.4);
+            transform: scale(1.05);
+        }
+
+        .stage-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .stage-icon {
+            font-size: 3em;
+            text-align: center;
+            margin: 20px 0;
+            opacity: 0.5;
+            transition: all 0.5s;
+        }
+
+        .flow-stage.active .stage-icon {
+            opacity: 1;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .stage-content {
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+
+        .stage-item {
+            background: rgba(255,255,255,0.1);
+            padding: 8px 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border-left: 3px solid transparent;
+            opacity: 0.5;
+            transition: all 0.3s;
+        }
+
+        .flow-stage.active .stage-item {
+            opacity: 1;
+            border-left-color: #4CAF50;
+            animation: slideIn 0.5s ease-out forwards;
+        }
+
+        .stage-item:nth-child(1) { animation-delay: 0.1s; }
+        .stage-item:nth-child(2) { animation-delay: 0.3s; }
+        .stage-item:nth-child(3) { animation-delay: 0.5s; }
+        .stage-item:nth-child(4) { animation-delay: 0.7s; }
+        .stage-item:nth-child(5) { animation-delay: 0.9s; }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .arrow {
+            position: absolute;
+            right: -30px;
+            top: 50%;
+            font-size: 2em;
+            opacity: 0.3;
+            transition: all 0.5s;
+        }
+
+        .flow-stage.active .arrow {
+            opacity: 1;
+            animation: moveArrow 1s infinite;
+        }
+
+        @keyframes moveArrow {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(10px); }
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .metric-card {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            border: 2px solid rgba(255,255,255,0.3);
+            transition: all 0.3s;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .metric-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin: 10px 0;
+            background: linear-gradient(45deg, #4CAF50, #8BC34A);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .metric-label {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .token-flow {
+            margin-top: 40px;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .token-comparison {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .token-bar-container {
+            flex: 1;
+            margin: 0 20px;
+        }
+
+        .token-bar-label {
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .token-bar {
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .token-bar-fill {
+            height: 100%;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            transition: width 2s ease-out;
+        }
+
+        .token-bar-fill.before {
+            background: linear-gradient(90deg, #f44336, #e91e63);
+            width: 0;
+        }
+
+        .token-bar-fill.after {
+            background: linear-gradient(90deg, #4CAF50, #8BC34A);
+            width: 0;
+        }
+
+        .token-flow.active .token-bar-fill.before {
+            width: 100%;
+        }
+
+        .token-flow.active .token-bar-fill.after {
+            width: 10%;
+        }
+
+        .vs {
+            font-size: 2em;
+            font-weight: bold;
+            padding: 0 20px;
+        }
+
+        .legend {
+            margin-top: 30px;
+            background: rgba(0,0,0,0.2);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .legend-item {
+            display: inline-block;
+            margin: 10px 20px;
+        }
+
+        .legend-color {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 5px rgba(76, 175, 80, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(76, 175, 80, 0.8); }
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+            background: #666;
+        }
+
+        .status-indicator.active {
+            background: #4CAF50;
+            animation: glow 2s infinite;
+        }
+
+        .timeline {
+            position: relative;
+            margin-top: 20px;
+            height: 6px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .timeline-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #8BC34A);
+            width: 0;
+            transition: width 0.5s;
+        }
+
+        @media (max-width: 1200px) {
+            .flow-diagram {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .arrow {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .flow-diagram {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 AgentGPT MCP Flow</h1>
+        <p class="subtitle">Optimized Development Workflow with Model Context Protocol</p>
+
+        <div class="controls">
+            <button class="btn" onclick="startAnimation()">▶️ Play Animation</button>
+            <button class="btn" onclick="pauseAnimation()">⏸️ Pause</button>
+            <button class="btn" onclick="resetAnimation()">🔄 Reset</button>
+        </div>
+
+        <div class="timeline">
+            <div class="timeline-progress" id="timeline"></div>
+        </div>
+
+        <div class="flow-diagram">
+            <!-- Stage 1: User Starts Session -->
+            <div class="flow-stage" id="stage1">
+                <div class="stage-title">
+                    <span class="status-indicator"></span>
+                    1️⃣ Session Start
+                </div>
+                <div class="stage-icon">👤</div>
+                <div class="stage-content">
+                    <div class="stage-item">💻 User opens Claude Code</div>
+                    <div class="stage-item">🔌 MCP servers connect</div>
+                    <div class="stage-item">🪝 session-start.sh runs</div>
+                    <div class="stage-item">✅ Environment validated</div>
+                    <div class="stage-item">📦 Dependencies checked</div>
+                </div>
+                <div class="arrow">→</div>
+            </div>
+
+            <!-- Stage 2: MCP Optimization -->
+            <div class="flow-stage" id="stage2">
+                <div class="stage-title">
+                    <span class="status-indicator"></span>
+                    2️⃣ MCP Optimization
+                </div>
+                <div class="stage-icon">⚡</div>
+                <div class="stage-content">
+                    <div class="stage-item">📁 Filesystem MCP active</div>
+                    <div class="stage-item">🐙 GitHub MCP connected</div>
+                    <div class="stage-item">📊 Git MCP enabled</div>
+                    <div class="stage-item">🌐 Fetch MCP ready</div>
+                    <div class="stage-item">💾 90% token reduction</div>
+                </div>
+                <div class="arrow">→</div>
+            </div>
+
+            <!-- Stage 3: Development Workflow -->
+            <div class="flow-stage" id="stage3">
+                <div class="stage-title">
+                    <span class="status-indicator"></span>
+                    3️⃣ Development
+                </div>
+                <div class="stage-icon">🛠️</div>
+                <div class="stage-content">
+                    <div class="stage-item">💬 /test-and-build runs</div>
+                    <div class="stage-item">🧪 Tests execute (parallel)</div>
+                    <div class="stage-item">📝 Linting validates code</div>
+                    <div class="stage-item">🏗️ Build completes</div>
+                    <div class="stage-item">✨ Quality verified</div>
+                </div>
+                <div class="arrow">→</div>
+            </div>
+
+            <!-- Stage 4: Deployment -->
+            <div class="flow-stage" id="stage4">
+                <div class="stage-title">
+                    <span class="status-indicator"></span>
+                    4️⃣ Deployment
+                </div>
+                <div class="stage-icon">🚀</div>
+                <div class="stage-content">
+                    <div class="stage-item">📋 /deploy executed</div>
+                    <div class="stage-item">✅ Pre-flight checks pass</div>
+                    <div class="stage-item">💾 Changes committed</div>
+                    <div class="stage-item">⬆️ Pushed to remote</div>
+                    <div class="stage-item">🎉 Deploy complete!</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Metrics Dashboard -->
+        <div class="metrics">
+            <div class="metric-card">
+                <div class="metric-label">Token Savings</div>
+                <div class="metric-value">90%</div>
+                <div>per file operation</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Speed Increase</div>
+                <div class="metric-value">10x</div>
+                <div>GitHub operations</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Tasks per Session</div>
+                <div class="metric-value">100+</div>
+                <div>vs 10 before</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Deploy Time</div>
+                <div class="metric-value">30s</div>
+                <div>automated workflow</div>
+            </div>
+        </div>
+
+        <!-- Token Flow Comparison -->
+        <div class="token-flow" id="tokenFlow">
+            <h2 style="margin-bottom: 20px;">📊 Token Usage Comparison</h2>
+            <div class="token-comparison">
+                <div class="token-bar-container">
+                    <div class="token-bar-label">❌ Without MCP: 2,000 tokens</div>
+                    <div class="token-bar">
+                        <div class="token-bar-fill before">2000</div>
+                    </div>
+                </div>
+                <div class="vs">VS</div>
+                <div class="token-bar-container">
+                    <div class="token-bar-label">✅ With MCP: 200 tokens</div>
+                    <div class="token-bar">
+                        <div class="token-bar-fill after">200</div>
+                    </div>
+                </div>
+            </div>
+            <div class="legend">
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #f44336;"></span>
+                    Traditional file reads
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #4CAF50;"></span>
+                    MCP optimized
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStage = 0;
+        let animationInterval;
+        let isPaused = false;
+
+        function startAnimation() {
+            resetAnimation();
+            isPaused = false;
+            animateFlow();
+        }
+
+        function pauseAnimation() {
+            isPaused = true;
+            clearInterval(animationInterval);
+        }
+
+        function resetAnimation() {
+            currentStage = 0;
+            clearInterval(animationInterval);
+
+            // Reset all stages
+            for (let i = 1; i <= 4; i++) {
+                const stage = document.getElementById(`stage${i}`);
+                stage.classList.remove('active');
+                const indicator = stage.querySelector('.status-indicator');
+                indicator.classList.remove('active');
+            }
+
+            // Reset token flow
+            document.getElementById('tokenFlow').classList.remove('active');
+
+            // Reset timeline
+            document.getElementById('timeline').style.width = '0%';
+        }
+
+        function animateFlow() {
+            const stages = 4;
+            const delay = 3000; // 3 seconds per stage
+
+            animationInterval = setInterval(() => {
+                if (isPaused) return;
+
+                if (currentStage < stages) {
+                    currentStage++;
+                    activateStage(currentStage);
+                    updateTimeline((currentStage / stages) * 100);
+                } else {
+                    // Show token flow comparison
+                    document.getElementById('tokenFlow').classList.add('active');
+                    clearInterval(animationInterval);
+
+                    // Auto-restart after showing final comparison
+                    setTimeout(() => {
+                        if (!isPaused) {
+                            startAnimation();
+                        }
+                    }, 5000);
+                }
+            }, delay);
+
+            // Activate first stage immediately
+            setTimeout(() => {
+                if (!isPaused) {
+                    activateStage(1);
+                    updateTimeline(25);
+                }
+            }, 100);
+        }
+
+        function activateStage(stageNum) {
+            const stage = document.getElementById(`stage${stageNum}`);
+            stage.classList.add('active');
+
+            const indicator = stage.querySelector('.status-indicator');
+            indicator.classList.add('active');
+
+            // Add sound effect (optional - commented out by default)
+            // playSound();
+        }
+
+        function updateTimeline(percent) {
+            document.getElementById('timeline').style.width = percent + '%';
+        }
+
+        // Auto-start animation on load
+        window.addEventListener('load', () => {
+            setTimeout(startAnimation, 1000);
+        });
+    </script>
+</body>
+</html>
