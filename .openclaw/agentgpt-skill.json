@@ -1,0 +1,90 @@
+{
+  "name": "agentgpt",
+  "version": "1.0.0",
+  "description": "Trigger autonomous AI agents via AgentGPT from OpenClaw",
+  "author": "AgentGPT Integration",
+  "type": "webhook",
+  "commands": [
+    {
+      "name": "agent",
+      "description": "Create and run an autonomous AI agent",
+      "usage": "/agent \"Agent Name\" - Your goal description",
+      "examples": [
+        "/agent \"Research Bot\" - Research the latest developments in quantum computing",
+        "/agent \"Task Manager\" - Break down project planning into actionable tasks",
+        "/agent \"Code Analyst\" - Analyze the security of a React application"
+      ],
+      "parameters": {
+        "name": {
+          "type": "string",
+          "required": true,
+          "description": "Name for your AI agent"
+        },
+        "goal": {
+          "type": "string",
+          "required": true,
+          "description": "The objective or goal for the agent to accomplish"
+        }
+      }
+    },
+    {
+      "name": "agent-status",
+      "description": "Check the status of a running agent",
+      "usage": "/agent-status <agent-id>",
+      "examples": [
+        "/agent-status cluid123abc"
+      ],
+      "parameters": {
+        "agentId": {
+          "type": "string",
+          "required": true,
+          "description": "The ID of the agent to check"
+        }
+      }
+    }
+  ],
+  "webhooks": {
+    "trigger": {
+      "url": "${AGENTGPT_URL}/api/openclaw/webhook",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "message": "{command}",
+        "sender": "{sender}",
+        "channel": "{channel}",
+        "token": "${OPENCLAW_WEBHOOK_TOKEN}"
+      }
+    },
+    "status": {
+      "url": "${AGENTGPT_URL}/api/openclaw/status",
+      "method": "GET",
+      "params": {
+        "agentId": "{agentId}",
+        "token": "${OPENCLAW_WEBHOOK_TOKEN}"
+      }
+    }
+  },
+  "environment": {
+    "AGENTGPT_URL": {
+      "description": "Base URL of your AgentGPT instance",
+      "default": "http://localhost:3000",
+      "required": true
+    },
+    "OPENCLAW_WEBHOOK_TOKEN": {
+      "description": "Webhook authentication token (must match AgentGPT config)",
+      "required": true,
+      "secret": true
+    }
+  },
+  "capabilities": [
+    "autonomous-agents",
+    "task-decomposition",
+    "multi-step-reasoning",
+    "goal-oriented-planning"
+  ],
+  "tags": ["ai", "agents", "automation", "tasks", "planning"],
+  "homepage": "https://github.com/reworkd/AgentGPT",
+  "documentation": "See OPENCLAW_INTEGRATION.md for setup instructions"
+}
