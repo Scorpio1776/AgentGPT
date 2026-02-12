@@ -1,0 +1,111 @@
+{
+  "name": "job-hunt-assistant",
+  "version": "1.0.0",
+  "description": "Comprehensive job search automation using AgentGPT autonomous agents",
+  "commands": [
+    {
+      "name": "job-search",
+      "description": "Search for jobs matching your profile and preferences",
+      "usage": "/job-search <role> in <location> [requirements]",
+      "examples": [
+        "/job-search Senior Software Engineer in Remote - focus on AI/ML, min $150k",
+        "/job-search Product Manager in San Francisco - 5+ years experience, B2B SaaS",
+        "/job-search Full Stack Developer in New York - React, Node.js, startup culture"
+      ]
+    },
+    {
+      "name": "tailor-resume",
+      "description": "Tailor your resume for a specific job posting",
+      "usage": "/tailor-resume <job_url_or_description>",
+      "examples": [
+        "/tailor-resume https://linkedin.com/jobs/view/123456789",
+        "/tailor-resume Senior Developer at Google - requiring Python, Go, distributed systems"
+      ]
+    },
+    {
+      "name": "company-research",
+      "description": "Deep research on a company before applying or interviewing",
+      "usage": "/company-research <company_name>",
+      "examples": [
+        "/company-research Anthropic",
+        "/company-research early-stage AI startup in SF"
+      ]
+    },
+    {
+      "name": "interview-prep",
+      "description": "Prepare for an interview with company-specific questions",
+      "usage": "/interview-prep <company> <role> [focus_areas]",
+      "examples": [
+        "/interview-prep Google Senior SWE - system design, algorithms",
+        "/interview-prep startup CTO - leadership, architecture decisions"
+      ]
+    },
+    {
+      "name": "application-tracker",
+      "description": "Track and manage your job applications",
+      "usage": "/application-tracker <action> [details]",
+      "examples": [
+        "/application-tracker add - Applied to Google SWE role, stage: Applied",
+        "/application-tracker update - Google moved to Phone Screen",
+        "/application-tracker status - Show all active applications"
+      ]
+    },
+    {
+      "name": "networking",
+      "description": "Find and research people to network with at target companies",
+      "usage": "/networking <company> [role_or_team]",
+      "examples": [
+        "/networking Anthropic - AI Safety team",
+        "/networking OpenAI - Engineering managers"
+      ]
+    },
+    {
+      "name": "salary-research",
+      "description": "Research competitive salary ranges for a role",
+      "usage": "/salary-research <role> in <location> [experience_level]",
+      "examples": [
+        "/salary-research Senior Software Engineer in SF - 8 years experience",
+        "/salary-research Product Manager in Remote - L6 equivalent"
+      ]
+    },
+    {
+      "name": "cover-letter",
+      "description": "Generate a tailored cover letter for a job",
+      "usage": "/cover-letter <company> <role> [key_points]",
+      "examples": [
+        "/cover-letter Anthropic AI Safety Engineer - highlight ML research background",
+        "/cover-letter startup CTO - emphasize scaling experience"
+      ]
+    }
+  ],
+  "webhooks": {
+    "job_search": {
+      "url": "${AGENTGPT_URL}/api/openclaw/webhook",
+      "method": "POST",
+      "body": {
+        "message": "/agent \"Job Search Agent\" - {command_details}",
+        "sender": "{sender}",
+        "channel": "{channel}",
+        "token": "${OPENCLAW_WEBHOOK_TOKEN}"
+      }
+    }
+  },
+  "environment": {
+    "RESUME_DATA_PATH": {
+      "description": "Path to your ResuMme Monster data or resume JSON",
+      "required": false
+    },
+    "LINKEDIN_PROFILE": {
+      "description": "Your LinkedIn profile URL for context",
+      "required": false
+    },
+    "TARGET_ROLES": {
+      "description": "Comma-separated list of target role titles",
+      "default": "Senior Software Engineer,Staff Engineer,Engineering Manager"
+    },
+    "TARGET_COMPANIES": {
+      "description": "Comma-separated list of dream companies",
+      "required": false
+    }
+  }
+}
